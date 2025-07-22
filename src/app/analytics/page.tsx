@@ -1,13 +1,77 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Header } from '@/components/header'
 // import { Footer } from '@/components/footer'
 import { useAuth } from '@/contexts/auth-context'
+import { getAllUrls } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { BarChart, Lock } from 'lucide-react'
+import type { Database } from '@/lib/supabase'
+
+type UrlRow = Database['public']['Tables']['urls']['Row']
+
+interface AnalyticsData {
+  totalClicks: number
+  totalUniqueVisitors: number
+  totalActiveLinks: number
+  topPerformingLinks: UrlRow[]
+}
 
 export default function AnalyticsPage() {
   const { user, loading } = useAuth()
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
+    totalClicks: 0,
+    totalUniqueVisitors: 0,
+    totalActiveLinks: 0,
+    topPerformingLinks: []
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      if (!user) return
+      
+      setIsLoading(true)
+      try {
+        // Fetch all URLs for the user
+        const result = await getAllUrls(1, 100) // Get first 100 URLs
+        
+        if (!result.error && result.data) {
+          const urls = result.data
+          
+          // Calculate analytics
+          const totalClicks = urls.reduce((sum, url) => sum + (url.click_count || 0), 0)
+          const totalUniqueVisitors = urls.reduce((sum, url) => sum + (url.unique_clicks || 0), 0)
+          const totalActiveLinks = urls.filter(url => url.is_active).length
+          
+          // Sort by click count for top performing links
+          const topPerformingLinks = urls
+            .filter(url => (url.click_count || 0) > 0)
+            .sort((a, b) => (b.click_count || 0) - (a.click_count || 0))
+            .slice(0, 5)
+          
+          setAnalyticsData({
+            totalClicks,
+            totalUniqueVisitors,
+            totalActiveLinks,
+            topPerformingLinks
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching analytics data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchAnalyticsData()
+  }, [user])
+
+  const calculateCTR = () => {
+    if (analyticsData.totalClicks === 0 || analyticsData.totalUniqueVisitors === 0) return 0
+    return ((analyticsData.totalUniqueVisitors / analyticsData.totalClicks) * 100).toFixed(1)
+  }
 
   if (loading) {
     return (
@@ -64,136 +128,157 @@ export default function AnalyticsPage() {
           
           {/* Analytics Stats */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="p-6 rounded-lg border border-border bg-card/50 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">1.2K+</div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-lg border border-border bg-card/50 text-center"
+            >
+              <div className="text-3xl font-bold text-primary mb-2">
+                {isLoading ? '...' : analyticsData.totalClicks.toLocaleString()}
+              </div>
               <div className="text-muted-foreground">Total Clicks</div>
-            </div>
+            </motion.div>
             
-            <div className="p-6 rounded-lg border border-border bg-card/50 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">856</div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-lg border border-border bg-card/50 text-center"
+            >
+              <div className="text-3xl font-bold text-primary mb-2">
+                {isLoading ? '...' : analyticsData.totalUniqueVisitors.toLocaleString()}
+              </div>
               <div className="text-muted-foreground">Unique Visitors</div>
-            </div>
+            </motion.div>
             
-            <div className="p-6 rounded-lg border border-border bg-card/50 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">42</div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="p-6 rounded-lg border border-border bg-card/50 text-center"
+            >
+              <div className="text-3xl font-bold text-primary mb-2">
+                {isLoading ? '...' : analyticsData.totalActiveLinks}
+              </div>
               <div className="text-muted-foreground">Active Links</div>
-            </div>
+            </motion.div>
             
-            <div className="p-6 rounded-lg border border-border bg-card/50 text-center">
-              <div className="text-3xl font-bold text-primary mb-2">2.8%</div>
-              <div className="text-muted-foreground">CTR Rate</div>
-            </div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="p-6 rounded-lg border border-border bg-card/50 text-center"
+            >
+              <div className="text-3xl font-bold text-primary mb-2">
+                {isLoading ? '...' : `${calculateCTR()}%`}
+              </div>
+              <div className="text-muted-foreground">Unique Rate</div>
+            </motion.div>
           </div>
           
           {/* Detailed Analytics */}
           <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div className="p-6 rounded-lg border border-border bg-card/50">
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="p-6 rounded-lg border border-border bg-card/50"
+            >
               <h3 className="text-xl font-semibold mb-4">Top Performing Links</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/demo</span>
-                  <span className="font-semibold">245 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/github</span>
-                  <span className="font-semibold">189 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/portfolio</span>
-                  <span className="font-semibold">156 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/blog</span>
-                  <span className="font-semibold">98 clicks</span>
-                </div>
+                {isLoading ? (
+                  <div className="space-y-3">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex justify-between items-center py-2 border-b border-border">
+                        <div className="h-4 bg-muted rounded w-1/2 animate-pulse"></div>
+                        <div className="h-4 bg-muted rounded w-16 animate-pulse"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : analyticsData.topPerformingLinks.length > 0 ? (
+                  analyticsData.topPerformingLinks.map((url) => (
+                    <div key={url.id} className="flex justify-between items-center py-2 border-b border-border">
+                      <span className="text-sm text-muted-foreground truncate max-w-xs">
+                        {process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/{url.custom_alias || url.short_code}
+                      </span>
+                      <span className="font-semibold">{url.click_count || 0} clicks</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No clicks yet!</p>
+                    <p className="text-sm">Share your links to start seeing data here.</p>
+                  </div>
+                )}
               </div>
-            </div>
+            </motion.div>
             
-            <div className="p-6 rounded-lg border border-border bg-card/50">
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="p-6 rounded-lg border border-border bg-card/50"
+            >
               <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm">New link created</span>
-                  <span className="text-xs text-muted-foreground">2 mins ago</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm">Link clicked</span>
-                  <span className="text-xs text-muted-foreground">5 mins ago</span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm">Custom alias set</span>
-                  <span className="text-xs text-muted-foreground">12 mins ago</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm">Link shared</span>
-                  <span className="text-xs text-muted-foreground">28 mins ago</span>
-                </div>
+                {isLoading ? (
+                  <div className="space-y-3">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex justify-between items-center py-2 border-b border-border">
+                        <div className="h-4 bg-muted rounded w-1/3 animate-pulse"></div>
+                        <div className="h-3 bg-muted rounded w-16 animate-pulse"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : analyticsData.topPerformingLinks.length > 0 ? (
+                  analyticsData.topPerformingLinks.slice(0, 4).map((url) => (
+                    <div key={`activity-${url.id}`} className="flex justify-between items-center py-2 border-b border-border">
+                      <span className="text-sm">Link created: {url.custom_alias || url.short_code}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(url.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No activity yet!</p>
+                    <p className="text-sm">Create some links to see activity here.</p>
+                  </div>
+                )}
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Geographic Data */}
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="p-6 rounded-lg border border-border bg-card/50">
-              <h3 className="text-xl font-semibold mb-4">Top Countries</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">🇺🇸</span>
-                    <span>United States</span>
-                  </div>
-                  <span className="font-semibold">342 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">🇬🇧</span>
-                    <span>United Kingdom</span>
-                  </div>
-                  <span className="font-semibold">189 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">🇩🇪</span>
-                    <span>Germany</span>
-                  </div>
-                  <span className="font-semibold">156 clicks</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">🇫🇷</span>
-                    <span>France</span>
-                  </div>
-                  <span className="font-semibold">98 clicks</span>
-                </div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="p-6 rounded-lg border border-border bg-card/50"
+            >
+              <h3 className="text-xl font-semibold mb-4">Geographic Data</h3>
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="mb-2">🌍</p>
+                <p>Geographic tracking coming soon!</p>
+                <p className="text-sm">We&apos;ll show where your clicks are coming from.</p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-lg border border-border bg-card/50">
-              <h3 className="text-xl font-semibold mb-4">Device Types</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">📱</span>
-                    <span>Mobile</span>
-                  </div>
-                  <span className="font-semibold">582 clicks (68%)</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">💻</span>
-                    <span>Desktop</span>
-                  </div>
-                  <span className="font-semibold">245 clicks (29%)</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">📟</span>
-                    <span>Tablet</span>
-                  </div>
-                  <span className="font-semibold">26 clicks (3%)</span>
-                </div>
+            <motion.div 
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="p-6 rounded-lg border border-border bg-card/50"
+            >
+              <h3 className="text-xl font-semibold mb-4">Device Analytics</h3>
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="mb-2">📊</p>
+                <p>Device tracking coming soon!</p>
+                <p className="text-sm">We&apos;ll show device types and browser data.</p>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </main>
