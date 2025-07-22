@@ -91,19 +91,19 @@ export default function AnalyticsPage() {
               <h3 className="text-xl font-semibold mb-4">Top Performing Links</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">localhost:3000/demo</span>
+                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/demo</span>
                   <span className="font-semibold">245 clicks</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">localhost:3000/github</span>
+                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/github</span>
                   <span className="font-semibold">189 clicks</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border">
-                  <span className="text-sm text-muted-foreground">localhost:3000/portfolio</span>
+                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/portfolio</span>
                   <span className="font-semibold">156 clicks</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm text-muted-foreground">localhost:3000/blog</span>
+                  <span className="text-sm text-muted-foreground">{process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000'}/blog</span>
                   <span className="font-semibold">98 clicks</span>
                 </div>
               </div>
