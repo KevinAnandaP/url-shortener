@@ -1,0 +1,26 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="linkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background with rounded corners for Apple -->
+  <rect width="180" height="180" rx="40" ry="40" fill="url(#linkGradient)"/>
+  
+  <!-- Link icon scaled up -->
+  <g transform="translate(50, 50) scale(2.5)">
+    <!-- First link -->
+    <path d="M6.5 8.5L9.5 5.5C10.3284 4.67157 11.6716 4.67157 12.5 5.5C13.3284 6.32843 13.3284 7.67157 12.5 8.5L9.5 11.5" 
+          stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    
+    <!-- Second link -->
+    <path d="M9.5 6.5L6.5 9.5C5.67157 10.3284 4.32843 10.3284 3.5 9.5C2.67157 8.67157 2.67157 7.32843 3.5 6.5L6.5 3.5" 
+          stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    
+    <!-- Connection line -->
+    <line x1="7.5" y1="7.5" x2="8.5" y2="6.5" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

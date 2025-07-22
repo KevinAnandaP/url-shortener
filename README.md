@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🔗 URL Shortener - Modern Link Management
 
-## Getting Started
+A modern, secure URL shortener built with Next.js 14, TypeScript, Tailwind CSS, and Supabase. Features user authentication, real-time analytics, and a beautiful dark-mode interface.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **🔒 User Authentication** - Secure sign up/sign in with email
+- **🚀 Fast URL Shortening** - Generate short URLs instantly with custom aliases
+- **📊 Personal Analytics** - Track your links with detailed insights
+- **🎨 Modern UI/UX** - Beautiful dark-mode interface with smooth animations
+- **📱 Responsive Design** - Optimized for all devices
+- **🔒 Privacy First** - Each user sees only their own URLs
+- **⚡ Performance Optimized** - Fast loading with efficient queries
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Font**: Geist
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎯 Key Functionality
 
-## Learn More
+### User Authentication
+- Secure email/password authentication
+- Protected dashboard and analytics pages
+- Row-level security for data isolation
 
-To learn more about Next.js, take a look at the following resources:
+### URL Management
+- Create short URLs with auto-generated or custom aliases
+- Edit original URLs and custom aliases
+- Delete URLs from your dashboard
+- Copy shortened URLs with one click
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Analytics Dashboard
+- View all your shortened URLs
+- Track click counts and creation dates
+- Monitor link performance over time
+- Manage your links efficiently
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🏗️ Architecture
 
-## Deploy on Vercel
+Built with modern best practices:
+- **Server Components** for optimal performance
+- **Client Components** for interactive features
+- **Row Level Security** for data protection
+- **Type-safe** database operations
+- **Responsive design** with mobile-first approach
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## � Security Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **User Authentication** - Supabase Auth integration
+- **Data Isolation** - Users can only access their own URLs
+- **Input Validation** - All URLs validated before processing
+- **SQL Injection Protection** - Parameterized queries
+- **HTTPS Enforcement** - Secure connections only
+
+---
+
+**Personal Project by Kevin Ananda Putra**  
+Built with ❤️ using Next.js & Supabase
